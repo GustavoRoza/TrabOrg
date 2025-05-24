@@ -29,7 +29,7 @@ main:
     ecall   
     
 
-breckjacquiLupi:
+breckjacquiLoop:
     la, a0, MSG_totalDeCartas 
     li a7, a4
     ecall
@@ -50,9 +50,22 @@ breckjacquiLupi:
     bne a0, t0, finaliza # Se não for 1, finaliza o jogo
 
     #reinicia o baralho
-    li t0, 20
-    bge s2,t0, resetaBaralho
+    li t0, 12
+    bge s2,t0, NaoResetaBaralho 
 
+    # Reseta o baralho
+    la t0, contador_cartas
+    li t1, 0
+    li t2, 13
+
+
+
+reseta_loop:
+    sw zero, 0(t0)
+    addi t0, t0, 4
+    addi t1, t1, 1
+    blt t1, t2, reset_loop
+    li s2, 52
 
 
 finaliza: 
