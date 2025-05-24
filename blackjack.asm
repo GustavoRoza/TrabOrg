@@ -28,6 +28,7 @@ MSG_BJ_tie:         .string "Empate!\n"
 MSG_BJ_newline:     .string "\n"
 
 # Array para controlar quantas cartas de cada valor foram distribuídas (1-13)
+#                        Ás, 2, 3, 4, 5, 6, 7, 8, 9, 10, J, Q, K
 card_count:         .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 # Array para armazenar as cartas do jogador e do dealer
