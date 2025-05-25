@@ -1,6 +1,15 @@
 # Jogo de Blackjack em Assembly RISC-V
 # Desenvolvido para o simulador RARS
 
+
+
+
+# paramos na linha 261
+
+
+
+
+
 .data
 MSG_BJ_welcome:             .string "Bem-vindo ao Blackjack!\n"
 MSG_BJ_total_cards:         .string "Total de Cartas: "
@@ -258,7 +267,7 @@ dealer_turn:
     la a0, MSG_BJ_dealer_cont
     li a7, 4
     ecall
-    
+
 dealer_hit_loop:
     # Verificar se o dealer precisa pedir mais cartas
     li t0, 17
@@ -486,6 +495,10 @@ player_turn_end:
 # a0 = endereço do array de cartas
 # a1 = número de cartas
 # Retorna o valor da mão em a0
+
+
+
+#######################################################################################################################################
 calculate_hand:
     li t0, 0       # Contador
     li t1, 0       # Soma
