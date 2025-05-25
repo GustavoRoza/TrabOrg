@@ -10,6 +10,8 @@ MSG_desejaJogar:            .string "Deseja jogar? (1 - Sim, 2 - Não): "
 MSG_cartas_jogador:         .string "O jogador recebe: "
 MSG_dealerMostrarCartas:    .string "O dealer revela: "
 
+MSG_quebraLinha:            .string "\n"
+
 # Array para controlar quantas cartas de cada valor foram distribuídas (1-13)
 #                             Ás, 2, 3, 4, 5, 6, 7, 8, 9, 10, J, Q, K
 contador_cartas:      .word    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
@@ -17,6 +19,8 @@ contador_cartas:      .word    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 cartas_jogador:        .space 40  # Espaço para até 10 cartas
 cartas_dealer:         .space 40  # Espaço para até 10 cartas
 
+.text
+.globl main
 main:
     # Inicializar pontuações
     li s0, 0       # Pontuação do dealer
@@ -29,18 +33,20 @@ main:
     ecall   
     
 
-breckjacquiLoop:
-    la, a0, MSG_totalDeCartas 
-    li a7, a4
+breckJacquiLoop:
+    la a0, MSG_totalDeCartas 
     ecall
 
     mv a0,s2
     li a7,1
     ecall
 
+    la a0, MSG_quebraLinha
+    li a7,4
+    ecall
+
     #pergunta se deseja jogar
     la a0, MSG_desejaJogar 
-    li a7,4
     ecall
 
     li a7,5
@@ -59,15 +65,23 @@ breckjacquiLoop:
     li t2, 13
 
 
-
-reseta_loop:
-    sw zero, 0(t0)
-    addi t0, t0, 4
-    addi t1, t1, 1
-    blt t1, t2, reset_loop
+embaralha:
+    sw zero, 0(t0)              # Zera o contador de cartas
+    addi t0, t0, 4              # Avança para o próximo contador
+    addi t1, t1, 1              # Incrementa o contador de cartas
+    blt t1, t2, embaralha 
     li s2, 52
 
 
 finaliza: 
     li a7, 10
     ecall
+
+NaoResetaBaralho:
+    jal novaRodada		# Iniciar nova rodada
+    j breckJacquiLoop		# Verificar se deseja jogar novamente
+
+novaRodada:
+    # Salvar registradores na pilha
+    addi sp, sp, -4
+    sw ra, 0(sp)    

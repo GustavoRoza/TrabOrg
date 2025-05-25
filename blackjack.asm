@@ -2,30 +2,30 @@
 # Desenvolvido para o simulador RARS
 
 .data
-MSG_BJ_welcome:     .string "Bem-vindo ao Blackjack!\n"
-MSG_BJ_total_cards: .string "Total de Cartas: "
-MSG_BJ_score:       .string "Pontuação:\n"
-MSG_BJ_dealer:      .string "	Dealer: "
-MSG_BJ_player:      .string "	Jogador: "
-MSG_BJ_play:        .string "Deseja jogar? (1 - Sim, 2 - Não): "
-MSG_BJ_player_cards:.string "O jogador recebe: "
-MSG_BJ_dealer_show: .string "O dealer revela: "
-MSG_BJ_hidden:      .string " e uma carta oculta\n"
-MSG_BJ_hand:        .string "Sua mão: "
-MSG_BJ_equals:      .string " = "
-MSG_BJ_plus:        .string " + "
-MSG_BJ_action:      .string "O que você deseja fazer? (1 - Hit, 2 - Stand): "
-MSG_BJ_player_gets: .string "O jogador recebe: "
-MSG_BJ_dealer_hand: .string "O dealer revela sua mão: "
-MSG_BJ_dealer_cont: .string "O dealer deve continuar pedindo cartas...\n"
-MSG_BJ_dealer_gets: .string "O dealer recebe: "
-MSG_BJ_dealer_has:  .string "O dealer tem: "
-MSG_BJ_player_bust: .string "Você estourou! O dealer venceu!\n"
-MSG_BJ_dealer_bust: .string "O dealer estourou! Você venceu!\n"
-MSG_BJ_player_win:  .string "Você venceu com uma pontuação maior!\n"
-MSG_BJ_dealer_win:  .string "O dealer venceu com uma pontuação maior!\n"
-MSG_BJ_tie:         .string "Empate!\n"
-MSG_BJ_newline:     .string "\n"
+MSG_BJ_welcome:             .string "Bem-vindo ao Blackjack!\n"
+MSG_BJ_total_cards:         .string "Total de Cartas: "
+MSG_BJ_score:               .string "Pontuação:\n"
+MSG_BJ_dealer:              .string "	Dealer: "
+MSG_BJ_player:              .string "	Jogador: "
+MSG_BJ_play:                .string "Deseja jogar? (1 - Sim, 2 - Não): "
+MSG_BJ_player_cards:        .string "O jogador recebe: "
+MSG_BJ_dealer_show:         .string "O dealer revela: "
+MSG_BJ_hidden:              .string " e uma carta oculta\n"
+MSG_BJ_hand:                .string "Sua mão: "
+MSG_BJ_equals:              .string " = "
+MSG_BJ_plus:                .string " + "
+MSG_BJ_action:              .string "O que você deseja fazer? (1 - Hit, 2 - Stand): "
+MSG_BJ_player_gets:         .string "O jogador recebe: "
+MSG_BJ_dealer_hand:         .string "O dealer revela sua mão: "
+MSG_BJ_dealer_cont:         .string "O dealer deve continuar pedindo cartas...\n"
+MSG_BJ_dealer_gets:         .string "O dealer recebe: "
+MSG_BJ_dealer_has:          .string "O dealer tem: "
+MSG_BJ_player_bust:         .string "Você estourou! O dealer venceu!\n"
+MSG_BJ_dealer_bust:         .string "O dealer estourou! Você venceu!\n"
+MSG_BJ_player_win:          .string "Você venceu com uma pontuação maior!\n"
+MSG_BJ_dealer_win:          .string "O dealer venceu com uma pontuação maior!\n"
+MSG_BJ_tie:                 .string "Empate!\n"
+MSG_BJ_newline:             .string "\n"
 
 # Array para controlar quantas cartas de cada valor foram distribuídas (1-13)
 #                        Ás, 2, 3, 4, 5, 6, 7, 8, 9, 10, J, Q, K
@@ -61,11 +61,7 @@ game_loop:
     
     la a0, MSG_BJ_newline
     li a7, 4
-    ecall
-    
-    # Exibir pontuação
-    la a0, MSG_BJ_score
-    li a7, 4
+    ecallround_end
     ecall
     
     la a0, MSG_BJ_dealer
@@ -109,7 +105,7 @@ game_loop:
     
     # Reiniciar contagem de cartas
     la t0, card_count
-    li t1, 0
+    li t1, 0 
     li t2, 13
 reset_loop:
     sw zero, 0(t0)
@@ -124,7 +120,6 @@ reset_not_needed:
     
     # Verificar se deseja jogar novamente
     j game_loop
-
 exit_game:
     # Encerrar programa
     li a7, 10
@@ -148,7 +143,7 @@ new_round:
     addi s2, s2, -1
     
     jal dealerDistribution
-    la t0, player_cards
+    la t0, player_cards 
     sb a0, 1(t0)
     addi s3, s3, 1
     addi s2, s2, -1
