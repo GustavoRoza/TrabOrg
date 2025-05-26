@@ -389,6 +389,7 @@ round_end:
 
 # Função para o turno do jogador
 # Retorna 1 se o jogador estourou, 0 caso contrário
+###############################################################################
 player_turn:
     # Salvar registradores na pilha
     addi sp, sp, -4
@@ -563,7 +564,7 @@ calc_as_one:
     # Ás vale 1
     addi t1, t1, 1
     
-calc_as_next:
+calc_as_next: #
     addi t0, t0, 1
     j calc_ases_loop
     

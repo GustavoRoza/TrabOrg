@@ -11,11 +11,22 @@ MSG_cartas_jogador:         .string     "O jogador recebe: "
 MSG_dealerMostrarCartas:    .string     "O dealer revela: "
 MSG_quebraLinha:            .string     "\n"
 MSG_cartaOculta:            .string     " e uma carta oculta\n"
+MSG_mao:                 .string "Sua mão: "
 MSG_igual:                  .string     " = "   
 MSG_mais:                   .string     " + "
-MSG_maoDoDealer:            .string     "O dealer revela sua mão: "
-MSG_dealerContinua:         .string     "O dealer deve continuar pedindo cartas...\n"
-MSG_jogadorEstourou:         .string "Você estourou! O dealer venceu!\n"
+MSG_perguntarAcao:          .string "O que você deseja fazer? (1 - Hit, 2 - Stand): "
+MSG_maoDoDealer:            .string "O dealer revela sua mão: "
+MSG_dealerRecebe:         .string "O dealer recebe: "
+MSG_dealerTem:          .string "O dealer tem: "
+MSG_dealerContinua:         .string "O dealer deve continuar pedindo cartas...\n"
+MSG_jogadorEstourou:        .string "Você estourou! O dealer venceu!\n"
+MSG_dealerEstourou:         .string "O dealer estourou! Você venceu!\n"
+MSG_jogadorGanhou:          .string "Você venceu com uma pontuação maior!\n"
+MSG_dealerGanhou:           .string "O dealer venceu com uma pontuação maior!\n"
+MSG_empate:                 .string "Empate!\n"
+MSG_jogadorRecebe:          .string "O jogador recebe: "
+
+
 
 
 
@@ -43,6 +54,7 @@ main:
 
 breckJacquiLoop:
     la a0, MSG_totalDeCartas 
+    li a7, 4
     ecall
 
     mv a0,s2
@@ -65,7 +77,7 @@ breckJacquiLoop:
 
     #reinicia o baralho
     li t0, 12
-    bge s2,t0, NaoResetaBaralho 
+    bge s2,t0, naoEmbaralha 
 
     # Reseta o baralho
     la t0, contador_cartas
@@ -83,7 +95,7 @@ finaliza:
     li a7, 10
     ecall
 
-NaoResetaBaralho:
+naoEmbaralha:
     jal novaRodada		    # Iniciar nova rodada
     j breckJacquiLoop		# Verificar se deseja jogar novamente
 
@@ -97,33 +109,26 @@ novaRodada:
     li s4, 0       # Número de cartas do dealer
 
     # Distribuir 2 cartas para o jogador
-    jal dealerDistribution
-    la t0, player_cards
-    sb a0, 0(t0)
-    addi s3, s3, 1
-    addi s2, s2, -1
-
-    # Distribuir 2 cartas para o jogador
-    jal dealerDistribution
+    jal distribuiCartaDealer
     la t0, cartas_jogador
     sb a0, 0(t0)
     addi s3, s3, 1
     addi s2, s2, -1
 
-    jal dealerDistribution
+    jal distribuiCartaDealer
     la t0, cartas_jogador 
     sb a0, 1(t0)
     addi s3, s3, 1
     addi s2, s2, -1
 
     # Distribuir 2 cartas para o dealer
-    jal dealerDistribution
+    jal distribuiCartaDealer
     la t0, cartas_dealer
     sb a0, 0(t0)
     addi s4, s4, 1
     addi s2, s2, -1
     
-    jal dealerDistribution
+    jal distribuiCartaDealer
     la t0, cartas_dealer
     sb a0, 1(t0)
     addi s4, s4, 1
@@ -167,7 +172,7 @@ novaRodada:
     ecall
 
     # Turno do jogador
-    jal player_turn
+    jal turnoJogador
     
     # Se o jogador não estourou, é a vez do dealer
     beqz a0, turnoDoDealer
@@ -179,7 +184,7 @@ novaRodada:
     
     # Incrementar pontuação do dealer
     addi s0, s0, 1
-    j round_end
+    j fimRodada
     
 turnoDoDealer:
     # Mostrar mão do dealer
@@ -204,7 +209,7 @@ turnoDoDealer:
     # Calcular valor da mão do dealer
     la a0, cartas_dealer
     li a1, 2  # Número inicial de cartas
-    jal calculate_hand
+    jal calcularMao
     mv s5, a0  # Salvar valor da mão do dealer
     
     la a0, MSG_igual
@@ -221,11 +226,349 @@ turnoDoDealer:
     
     # Verificar se o dealer precisa pedir mais cartas
     li t0, 17
-    bge s5, t0, compare_hands
+    bge s5, t0, comparaMao
     
     la a0, MSG_dealerContinua
     li a7, 4
-    ecall    
+    ecall   
+
+dealerEstouraLoop:
+    # Verificar se o dealer precisa pedir mais cartas
+    li t0, 17
+    bge s5, t0, comparaMao
+    
+    # Dealer pede mais uma carta
+    jal distribuiCartaDealer
+    la t0, cartas_dealer
+    add t0, t0, s4
+    sb a0, 0(t0)
+    addi s4, s4, 1
+    addi s2, s2, -1
+    
+    # Mostrar carta recebida
+    la a0, MSG_dealerRecebe
+    li a7, 4
+    ecall
+    
+    mv a0, a0
+    li a7, 1
+    ecall
+    
+    la a0, MSG_quebraLinha
+    li a7, 4
+    ecall
+    
+    # Recalcular valor da mão do dealer
+    la a0, cartas_dealer
+    mv a1, s4
+    jal calcularMao
+    mv s5, a0
+    
+    # Mostrar mão atual do dealer
+    la a0, MSG_dealerTem
+    li a7, 4
+    ecall
+    
+    # Mostrar todas as cartas do dealer
+    la t0, cartas_dealer
+    li t1, 0
+    
+dealerMostraCartas:
+    lb a0, 0(t0)
+    li a7, 1
+    ecall
+    
+    addi t1, t1, 1
+    beq t1, s4, fimExibicaoCartasDealer
+    
+    la a0, MSG_mais
+    li a7, 4
+    ecall
+    
+    addi t0, t0, 1
+    j dealerMostraCartas
+    
+fimExibicaoCartasDealer:
+    la a0, MSG_igual
+    li a7, 4
+    ecall
+    
+    mv a0, s5
+    li a7, 1
+    ecall
+    
+    la a0, MSG_quebraLinha
+    li a7, 4
+    ecall
+    
+    # Verificar se o dealer estourou
+    li t0, 21
+    ble s5, t0, dealerEstouraLoop
+    
+    # Dealer estourou
+    la a0, MSG_dealerEstourou
+    li a7, 4
+    ecall
+    
+    # Incrementar pontuação do jogador
+    addi s1, s1, 1
+    j fimRodada
+    
+    
+
+turnoJogador:
+    # Salvar registradores na pilha
+    addi sp, sp, -4
+    sw ra, 0(sp)
+    
+turnoJogadorLoop:
+    # Mostrar mão atual do jogador
+    la a0, MSG_mao
+    li a7, 4
+    ecall
+    
+    # Mostrar todas as cartas do jogador
+    la t0, cartas_jogador
+    li t1, 0 
 
 
+jogadorMostraCartas:
+    lb a0, 0(t0)
+    li a7, 1
+    ecall
+    
+    addi t1, t1, 1
+    beq t1, s3, fimExibicaoCartasJogador
+    
+    la a0, MSG_mais
+    li a7, 4
+    ecall
+    
+    addi t0, t0, 1
+    j jogadorMostraCartas
 
+    
+fimExibicaoCartasJogador:
+    # Calcular valor da mão do jogador
+    la a0, cartas_jogador
+    mv a1, s3
+    jal calcularMao
+    mv s6, a0  # Salvar valor da mão do jogador
+    
+    la a0, MSG_igual
+    li a7, 4
+    ecall
+    
+    mv a0, s6
+    li a7, 1
+    ecall
+    
+    la a0, MSG_quebraLinha
+    li a7, 4
+    ecall
+    
+    # Verificar se o jogador estourou
+    li t0, 21
+    bgt s6, t0, jogadorEstourou
+    
+    # Perguntar ação do jogador
+    la a0, MSG_perguntarAcao
+    li a7, 4
+    ecall
+    
+    li a7, 5
+    ecall
+    
+    li t0, 1
+    bne a0, t0, jogadorStand
+    
+    # Jogador pede mais uma carta (Hit)
+    jal distribuiCartaDealer
+    la t0, cartas_jogador
+    add t0, t0, s3
+    sb a0, 0(t0)
+    addi s3, s3, 1
+    addi s2, s2, -1
+    
+    # Mostrar carta recebida
+    la a0, MSG_jogadorRecebe
+    li a7, 4
+    ecall
+    
+    mv a0, a0
+    li a7, 1
+    ecall
+    
+    la a0, MSG_quebraLinha
+    li a7, 4
+    ecall
+    
+    j turnoJogadorLoop
+    
+jogadorStand:
+    # Jogador para (Stand)
+    li a0, 0  # Não estourou
+    j turnoJogadorFim
+    
+jogadorEstourou:
+    # Jogador estourou
+    li a0, 1  # Estourou
+    
+turnoJogadorFim:
+    # Restaurar registradores da pilha
+    lw ra, 0(sp)
+    addi sp, sp, 4
+    ret
+
+# Função para calcular o valor da mão
+# a0 = endereço do array de cartas
+# a1 = número de cartas
+# Retorna o valor da mão em a0
+
+###############################################################################################################
+
+calcularMao:
+    li t0, 0       # Contador
+    li t1, 0       # Soma
+    li t2, 0       # Número de Ases
+    j LoopParaCalcularCarta    # Adicionado jump para o loop correto
+
+# Função para comparar as mãos e determinar o vencedor
+comparaMao:
+    # Calcular valor da mão do jogador
+    la a0, cartas_jogador
+    mv a1, s3
+    jal calcularMao
+    mv s6, a0  # Salvar valor da mão do jogador
+    
+    # Comparar mãos
+    bgt s6, s5, jogadorGanha
+    bgt s5, s6, dealerGanha
+    
+    # Empate
+    la a0, MSG_empate
+    li a7, 4
+    ecall 
+    j fimRodada   
+
+jogadorGanha:
+    la a0, MSG_jogadorGanhou
+    li a7, 4
+    ecall
+    addi s1, s1, 1
+    j fimRodada
+
+dealerGanha:
+    la a0, MSG_dealerGanhou
+    li a7, 4
+    ecall
+    addi s0, s0, 1
+    j fimRodada
+
+fimRodada:
+    # Restaurar registradores da pilha
+    lw ra, 0(sp)
+    addi sp, sp, 4
+    ret
+
+
+LoopParaCalcularCarta:
+    beq t0, a1, calculaAses
+    
+    lb t3, 0(a0)   # Carregar carta
+    
+    # Verificar valor da carta
+    li t4, 1
+    beq t3, t4, calculaAs
+    
+    li t4, 11      # Valete
+    beq t3, t4, calculaNaipe
+    
+    li t4, 12      # Dama
+    beq t3, t4, calculaNaipe
+    
+    li t4, 13      # Rei
+    beq t3, t4, calculaNaipe
+    
+    # Carta numerada (2-10)
+    add t1, t1, t3
+    j calculaProxima
+    
+calculaAs:
+    # Ás (contabilizado depois)
+    addi t2, t2, 1
+    j calculaProxima
+    
+calculaNaipe:
+    # Figura (vale 10)
+    addi t1, t1, 10
+    
+calculaProxima:
+    addi a0, a0, 1
+    addi t0, t0, 1
+    j LoopParaCalcularCarta
+    
+calculaAses:
+    # Processar Ases
+    beqz t2, calculaFim
+    
+    # Para cada Ás, decidir se vale 1 ou 11
+    li t0, 0
+    
+LoopCalculaAs:
+    beq t0, t2, calculaFim
+    
+    # Verificar se adicionar 11 estoura
+    addi t3, t1, 11
+    li t4, 21
+    bgt t3, t4, asValeUm
+    
+    # Ás vale 11
+    addi t1, t1, 11
+    j incrementaAses
+    
+asValeUm:
+    # Ás vale 1
+    addi t1, t1, 1
+    
+incrementaAses: 
+    addi t0, t0, 1
+    j LoopCalculaAs
+    
+calculaFim:
+    mv a0, t1
+    ret
+
+
+distribuiCartaDealer:
+    # Salvar registradores na pilha
+    addi sp, sp, -4
+    sw ra, 0(sp)
+    
+    # Gerar número aleatório entre 1 e 13
+pescaCarta:
+    li a7, 42      # Syscall para número aleatório
+    li a1, 13      # Limite superior (exclusivo)
+    ecall
+    addi a0, a0, 1 # Ajustar para 1-13
+    
+    # Verificar se já foram distribuídas 4 cartas desse valor
+    la t0, contador_cartas
+    addi t0, t0, -4
+    slli t1, a0, 2  # Multiplicar por 4 para obter o offset
+    add t0, t0, t1
+    lw t1, 0(t0)
+    
+    li t2, 4
+    bge t1, t2, pescaCarta  # Se já distribuiu 4, tenta outro número
+    
+    # Incrementar contagem dessa carta
+    addi t1, t1, 1
+    sw t1, 0(t0)
+    
+    # Restaurar registradores da pilha
+    lw ra, 0(sp)
+    addi sp, sp, 4
+    ret
+
+#
