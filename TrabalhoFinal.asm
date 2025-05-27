@@ -7,24 +7,24 @@ MSG_pontuacao:		        .string     "Pontuacao:\n"
 MSG_dealer:		            .string     "   Dealer: "
 MSG_jogador:		        .string     "   Jogador: "
 MSG_desejaJogar:            .string     "Deseja jogar? (1 - Sim, 2 - Não): "
-MSG_cartas_jogador:         .string     "O jogador recebe: "
+MSG_cartas_jogador:         .string     "\n\nO jogador recebe: "
 MSG_dealerMostrarCartas:    .string     "O dealer revela: "
 MSG_quebraLinha:            .string     "\n"
 MSG_cartaOculta:            .string     " e uma carta oculta\n"
-MSG_mao:                 .string "Sua mão: "
+MSG_mao:                    .string     "Sua mao: "
 MSG_igual:                  .string     " = "   
 MSG_mais:                   .string     " + "
-MSG_perguntarAcao:          .string "O que você deseja fazer? (1 - Hit, 2 - Stand): "
-MSG_maoDoDealer:            .string "O dealer revela sua mão: "
-MSG_dealerRecebe:         .string "O dealer recebe: "
-MSG_dealerTem:          .string "O dealer tem: "
-MSG_dealerContinua:         .string "O dealer deve continuar pedindo cartas...\n"
-MSG_jogadorEstourou:        .string "Você estourou! O dealer venceu!\n"
-MSG_dealerEstourou:         .string "O dealer estourou! Você venceu!\n"
-MSG_jogadorGanhou:          .string "Você venceu com uma pontuação maior!\n"
-MSG_dealerGanhou:           .string "O dealer venceu com uma pontuação maior!\n"
-MSG_empate:                 .string "Empate!\n"
-MSG_jogadorRecebe:          .string "O jogador recebe: "
+MSG_perguntarAcao:          .string     "O que voce deseja fazer? (1 - Hit, 2 - Stand): "
+MSG_maoDoDealer:            .string     "O dealer revela sua mao: "
+MSG_dealerRecebe:           .string     "O dealer recebe: "
+MSG_dealerTem:              .string     "O dealer tem: "
+MSG_dealerContinua:         .string     "O dealer deve continuar pedindo cartas...\n"
+MSG_jogadorEstourou:        .string     "Você estourou! O dealer venceu!\n"
+MSG_dealerEstourou:         .string     "O dealer estourou! Você venceu!\n"
+MSG_jogadorGanhou:          .string     "Voce venceu com uma pontuacao maior!\n"
+MSG_dealerGanhou:           .string     "O dealer venceu com uma pontuação maior!\n"
+MSG_empate:                 .string     "Empate!\n"
+MSG_baralhoResetado:        .string     "\n\nO baralho foi resetado e embaralhado!"
 
 
 
@@ -33,7 +33,7 @@ MSG_jogadorRecebe:          .string "O jogador recebe: "
 
 # Array para controlar quantas cartas de cada valor foram distribuídas (1-13)
 #                             Ás, 2, 3, 4, 5, 6, 7, 8, 9, 10, J, Q, K
-contador_cartas:      .word    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+contador_cartas:        .word    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 cartas_jogador:        .space 40        # Espaço para até 10 cartas
 cartas_dealer:         .space 40        # Espaço para até 10 cartas
@@ -57,19 +57,23 @@ breckJacquiLoop:
     li a7, 4
     ecall
 
-    mv a0,s2
-    li a7,1
+    mv a0, s2
+    li a7, 1
     ecall
 
     la a0, MSG_quebraLinha
-    li a7,4
+    li a7, 4
     ecall
+
+    # Exibe a pontuação antes de perguntar se deseja jogar
+    jal exibePontuacao
 
     #pergunta se deseja jogar
     la a0, MSG_desejaJogar 
+    li a7, 4
     ecall
 
-    li a7,5
+    li a7, 5
     ecall
 
     li t0, 1 
@@ -77,12 +81,59 @@ breckJacquiLoop:
 
     #reinicia o baralho
     li t0, 12
-    bge s2,t0, naoEmbaralha 
+    bgt s2, t0, NaoResetaBaralho  # Se s2 > 12, não reseta o baralho
+    li a7, 4
+    la a0, MSG_baralhoResetado
+    ecall
 
     # Reseta o baralho
     la t0, contador_cartas
     li t1, 0
     li t2, 13
+
+
+# Função: exibePontuacao
+# Exibe a pontuação atual do dealer e do jogador
+# Usa s0 (dealer) e s1 (jogador)
+# Não altera s0/s1
+
+exibePontuacao:
+    # Exibe "Pontuacao:\n"
+    la a0, MSG_pontuacao
+    li a7, 4
+    ecall
+
+    # Exibe "   Dealer: "
+    la a0, MSG_dealer
+    li a7, 4
+    ecall
+
+    # Exibe valor do dealer (s0)
+    mv a0, s0
+    li a7, 1
+    ecall
+
+    # Exibe quebra de linha
+    la a0, MSG_quebraLinha
+    li a7, 4
+    ecall
+
+    # Exibe "   Jogador: "
+    la a0, MSG_jogador
+    li a7, 4
+    ecall
+
+    # Exibe valor do jogador (s1)
+    mv a0, s1
+    li a7, 1
+    ecall
+
+    # Exibe quebra de linha
+    la a0, MSG_quebraLinha
+    li a7, 4
+    ecall
+
+    ret
 
 embaralha:
     sw zero, 0(t0)              # Zera o contador de cartas
@@ -91,13 +142,13 @@ embaralha:
     blt t1, t2, embaralha 
     li s2, 52
 
+NaoResetaBaralho:
+    jal novaRodada              # Iniciar nova rodada
+    j breckJacquiLoop           # Verificar se deseja jogar novamente
+
 finaliza: 
     li a7, 10
     ecall
-
-naoEmbaralha:
-    jal novaRodada		    # Iniciar nova rodada
-    j breckJacquiLoop		# Verificar se deseja jogar novamente
 
 novaRodada:
     # Salvar registradores na pilha
@@ -391,7 +442,7 @@ fimExibicaoCartasJogador:
     addi s2, s2, -1
     
     # Mostrar carta recebida
-    la a0, MSG_jogadorRecebe
+    la a0, MSG_cartas_jogador
     li a7, 4
     ecall
     
