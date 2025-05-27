@@ -259,9 +259,9 @@ turnoDoDealer:
     
     # Calcular valor da mão do dealer
     la a0, cartas_dealer
-    li a1, 2  # Número inicial de cartas
+    mv a1, s4      # Usa o número real de cartas do dealer
     jal calcularMao
-    mv s5, a0  # Salvar valor da mão do dealer
+    mv s5, a0
     
     la a0, MSG_igual
     li a7, 4
