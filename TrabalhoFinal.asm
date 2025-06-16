@@ -25,7 +25,10 @@ MSG_jogadorGanhou:          .string     "Voce venceu com uma pontuacao maior!\n"
 MSG_dealerGanhou:           .string     "O dealer venceu com uma pontuação maior!\n"
 MSG_empate:                 .string     "Empate!\n"
 MSG_baralhoResetado:        .string     "\n\nO baralho foi resetado e embaralhado!"
-
+MSG_dama:                 .string     "Q"
+MSG_valete:               .string     "J"
+MSG_rei:                  .string     "K"
+MSG_as:			  .string 	"As"
 
 
 
@@ -293,6 +296,7 @@ dealerEstouraLoop:
     la t0, cartas_dealer
     add t0, t0, s4
     sb a0, 0(t0)
+    mv t1, a0 #aqui salva em um temporaio a carta que o dealer recebe, para podermos printar dps
     addi s4, s4, 1
     addi s2, s2, -1
     
@@ -301,7 +305,7 @@ dealerEstouraLoop:
     li a7, 4
     ecall
     
-    mv a0, a0
+    mv a0, t1
     li a7, 1
     ecall
     
@@ -438,6 +442,7 @@ fimExibicaoCartasJogador:
     la t0, cartas_jogador
     add t0, t0, s3
     sb a0, 0(t0)
+    mv t1, a0 # salva a carta que o jogador recebe em t1 para poder printar dps (linha 453)
     addi s3, s3, 1
     addi s2, s2, -1
     
@@ -446,7 +451,7 @@ fimExibicaoCartasJogador:
     li a7, 4
     ecall
     
-    mv a0, a0
+    mv a0, t1
     li a7, 1
     ecall
     
@@ -621,5 +626,4 @@ pescaCarta:
     lw ra, 0(sp)
     addi sp, sp, 4
     ret
-
-#
+    
