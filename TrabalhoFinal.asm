@@ -3,7 +3,7 @@
 .data
 MSG_bemvindo:		        .string     "Bem vindo ao BlackJack!\n"
 MSG_totalDeCartas: 	        .string     "Total de Cartas: "
-MSG_pontuacao:		        .string     "Pontuacao:\n"
+MSG_pontuacao:		        .string     "\nPontuacao:\n"
 MSG_dealer:		            .string     "   Dealer: "
 MSG_jogador:		        .string     "   Jogador: "
 MSG_desejaJogar:            .string     "Deseja jogar? (1 - Sim, 2 - Não): "
@@ -25,9 +25,6 @@ MSG_jogadorGanhou:          .string     "Voce venceu com uma pontuacao maior!\n"
 MSG_dealerGanhou:           .string     "O dealer venceu com uma pontuação maior!\n"
 MSG_empate:                 .string     "Empate!\n"
 MSG_baralhoResetado:        .string     "\n\nO baralho foi resetado e embaralhado!"
-
-
-
 
 
 
@@ -90,6 +87,8 @@ breckJacquiLoop:
     la t0, contador_cartas
     li t1, 0
     li t2, 13
+    jal embaralha
+    j NaoResetaBaralho 
 
 
 # Função: exibePontuacao

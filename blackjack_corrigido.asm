@@ -90,10 +90,13 @@ breckJacquiLoop:
     la a0, MSG_baralhoResetado
     ecall
 
+
     # Reseta o baralho
     la t0, contador_cartas
     li t1, 0
     li t2, 13
+    jal embaralha
+    j NaoResetaBaralho 
 
 
 # Função: exibePontuacao
