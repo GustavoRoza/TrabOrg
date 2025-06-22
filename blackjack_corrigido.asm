@@ -3,7 +3,7 @@
 .data
 MSG_bemvindo:		        .string     "Bem vindo ao BlackJack!\n"
 MSG_totalDeCartas: 	        .string     "Total de Cartas: "
-MSG_pontuacao:		        .string     "Pontuacao:\n"
+MSG_pontuacao:		        .string     "\nPontuacao:\n"
 MSG_dealer:		            .string     "   Dealer: "
 MSG_jogador:		        .string     "   Jogador: "
 MSG_desejaJogar:            .string     "Deseja jogar? (1 - Sim, 2 - Não): "
@@ -25,10 +25,11 @@ MSG_jogadorGanhou:          .string     "Voce venceu com uma pontuacao maior!\n"
 MSG_dealerGanhou:           .string     "O dealer venceu com uma pontuação maior!\n"
 MSG_empate:                 .string     "Empate!\n"
 MSG_baralhoResetado:        .string     "\n\nO baralho foi resetado e embaralhado!"
-MSG_dama:                 .string     "Q"
-MSG_valete:               .string     "J"
-MSG_rei:                  .string     "K"
-MSG_as:			  .string 	"As"
+
+MSG_debug: 			.string "\ndebug 1\n"
+MSG_debugg: 			.string "\ndebug 2\n"
+MSG_debuggg: 			.string "\ndebug 3\n"
+MSG_debugggg: 			.string "\ndebug 4\n"
 
 
 
@@ -93,7 +94,6 @@ breckJacquiLoop:
     la t0, contador_cartas
     li t1, 0
     li t2, 13
-    jal embaralha
 
 
 # Função: exibePontuacao
@@ -193,10 +193,11 @@ novaRodada:
     la a0, MSG_cartas_jogador
     li a7, 4
     ecall
-# TRO QUEEEEEII    
+    
     la t0, cartas_jogador
     lb a0, 0(t0)
-    jal exibeCartaJogador
+    li a7, 1
+    ecall
     
     la a0, MSG_mais
     li a7, 4
@@ -204,7 +205,8 @@ novaRodada:
     
     la t0, cartas_jogador
     lb a0, 1(t0)
-    jal exibeCartaJogador
+    li a7, 1
+    ecall
     
     la a0, MSG_quebraLinha
     li a7, 4
@@ -217,7 +219,8 @@ novaRodada:
     
     la t0, cartas_dealer
     lb a0, 0(t0)
-    jal exibeCartaDealer
+    li a7, 1
+    ecall
     
     la a0, MSG_cartaOculta
     li a7, 4
@@ -243,10 +246,11 @@ turnoDoDealer:
     la a0, MSG_maoDoDealer
     li a7, 4
     ecall
- #troqueiiiiii   
+    
     la t0, cartas_dealer
     lb a0, 0(t0)
-    jal exibeCartaDealer
+    li a7, 1
+    ecall
     
     la a0, MSG_mais
     li a7, 4
@@ -254,7 +258,8 @@ turnoDoDealer:
     
     la t0, cartas_dealer
     lb a0, 1(t0)
-    jal exibeCartaDealer
+    li a7, 1
+    ecall
     
     # Calcular valor da mão do dealer
     la a0, cartas_dealer
@@ -292,8 +297,7 @@ dealerEstouraLoop:
     la t0, cartas_dealer
     add t0, t0, s4
     sb a0, 0(t0)
-    mv t5, a0 #salva carta recebida em t5
-#    mv t1, a0 # aqui salva em um temporaio a carta que o dealer recebe, para podermos printar dps
+    mv t1, a0 #aqui salva em um temporaio a carta que o dealer recebe, para podermos printar dps
     addi s4, s4, 1
     addi s2, s2, -1
     
@@ -301,12 +305,10 @@ dealerEstouraLoop:
     la a0, MSG_dealerRecebe
     li a7, 4
     ecall
-#troqueiii  
-#    mv a0, t1
-#        li a7, 1
-#        ecall
-    mv a0, t5
-    jal exibeCartaDealer
+    
+    mv a0, t1
+    li a7, 1
+    ecall
     
     la a0, MSG_quebraLinha
     li a7, 4
@@ -329,8 +331,9 @@ dealerEstouraLoop:
     
 dealerMostraCartas:
     lb a0, 0(t0)
-    jal exibeCartaDealer
-#troqueiii    
+    li a7, 1
+    ecall
+    
     addi t1, t1, 1
     beq t1, s4, fimExibicaoCartasDealer
     
@@ -387,7 +390,8 @@ turnoJogadorLoop:
 
 jogadorMostraCartas:
     lb a0, 0(t0)
-    jal exibeCartaJogador
+    li a7, 1
+    ecall
     
     addi t1, t1, 1
     beq t1, s3, fimExibicaoCartasJogador
@@ -447,9 +451,10 @@ fimExibicaoCartasJogador:
     la a0, MSG_cartas_jogador
     li a7, 4
     ecall
-#troquei    
+    
     mv a0, t1
-    jal exibeCartaJogador
+    li a7, 1
+    ecall
     
     la a0, MSG_quebraLinha
     li a7, 4
@@ -622,69 +627,4 @@ pescaCarta:
     lw ra, 0(sp)
     addi sp, sp, 4
     ret
-
-# Função: Exibe carta do jogador (J, Q, K por nome, demais por número)
-# Entrada: a0 = valor da carta
-exibeCartaJogador:
-    mv t1, a0           # Salva a carta em t1
-    li t2, 11
-    beq a0, t2, exibeValeteJogador
-    li t2, 12
-    beq a0, t2, exibeDamaJogador
-    li t2, 13
-    beq a0, t2, exibeReiJogador
-    # Se não for J/Q/K, exibe número
-    li a7, 1
-    ecall
-    ret
-
-exibeValeteJogador:
-    la a0, MSG_valete
-    li a7, 4
-    ecall
-    ret
-
-exibeDamaJogador:
-    la a0, MSG_dama
-    li a7, 4
-    ecall
-    ret
-
-exibeReiJogador:
-    la a0, MSG_rei
-    li a7, 4
-    ecall
-    ret
-
-# Função: Exibe carta do dealer (J, Q, K por nome, demais por número)
-# Entrada: a0 = valor da carta
-exibeCartaDealer:
-    mv t1, a0           # Salva a carta em t1
-    li t2, 11
-    beq a0, t2, exibeValeteDealer
-    li t2, 12
-    beq a0, t2, exibeDamaDealer
-    li t2, 13
-    beq a0, t2, exibeReiDealer
-    # Se não for J/Q/K, exibe número
-    li a7, 1
-    ecall
-    ret
-
-exibeValeteDealer:
-    la a0, MSG_valete
-    li a7, 4
-    ecall
-    ret
-
-exibeDamaDealer:
-    la a0, MSG_dama
-    li a7, 4
-    ecall
-    ret
-
-exibeReiDealer:
-    la a0, MSG_rei
-    li a7, 4
-    ecall
-    ret  
+    

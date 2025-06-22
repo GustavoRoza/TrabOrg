@@ -25,10 +25,7 @@ MSG_jogadorGanhou:          .string     "Voce venceu com uma pontuacao maior!\n"
 MSG_dealerGanhou:           .string     "O dealer venceu com uma pontuação maior!\n"
 MSG_empate:                 .string     "Empate!\n"
 MSG_baralhoResetado:        .string     "\n\nO baralho foi resetado e embaralhado!"
-MSG_dama:                 .string     "Q"
-MSG_valete:               .string     "J"
-MSG_rei:                  .string     "K"
-MSG_as:			  .string 	"As"
+
 
 
 
