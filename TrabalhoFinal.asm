@@ -146,6 +146,7 @@ NaoResetaBaralho:
     j breckJacquiLoop           # Verificar se deseja jogar novamente
 
 finaliza: 
+    jal exibePontuacao
     li a7, 10
     ecall
 
