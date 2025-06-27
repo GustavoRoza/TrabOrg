@@ -146,7 +146,7 @@ NaoResetaBaralho:
     j breckJacquiLoop           # Verificar se deseja jogar novamente
 
 finaliza: 
-    jal exibePontuacao
+    jal exibePontuacaoFinal
     li a7, 10
     ecall
 
@@ -624,3 +624,75 @@ pescaCarta:
     addi sp, sp, 4
     ret
     
+exibePontuacaoFinal:
+    # Exibe "Pontuacao:\n"
+    la a0, MSG_pontuacao
+    li a7, 4
+    ecall
+
+    # Exibe "   Dealer: "
+    la a0, MSG_dealer
+    li a7, 4
+    ecall
+
+    # Exibe valor do dealer (s0)
+    mv a0, s0
+    li a7, 1
+    ecall
+
+    # Exibe quebra de linha
+    la a0, MSG_quebraLinha
+    li a7, 4
+    ecall
+
+    # Exibe "   Jogador: "
+    la a0, MSG_jogador
+    li a7, 4
+    ecall
+
+    # Exibe valor do jogador (s1)
+    mv a0, s1
+    li a7, 1
+    ecall
+
+    # Exibe quebra de linha
+    la a0, MSG_quebraLinha
+    li a7, 4
+    ecall
+
+    beq s0, s1, empateFinal
+    bgt s0, s1, dealerGanhouFinal
+    bgt s1, s0, jogadorGanhouFinal
+
+empateFinal:
+    # Exibe quebra de linha
+    la a0, MSG_quebraLinha
+    li a7, 4
+    ecall
+    
+    la a0, MSG_empate
+    li a7, 4
+    ecall
+    ret 
+
+dealerGanhouFinal:
+    # Exibe quebra de linha
+    la a0, MSG_quebraLinha
+    li a7, 4
+    ecall
+    
+    la a0, MSG_dealerGanhou
+    li a7, 4
+    ecall
+    ret
+
+jogadorGanhouFinal:
+    # Exibe quebra de linha
+    la a0, MSG_quebraLinha
+    li a7, 4
+    ecall
+	
+    la a0, MSG_jogadorGanhou
+    li a7, 4
+    ecall
+    ret
