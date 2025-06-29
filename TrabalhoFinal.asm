@@ -473,12 +473,12 @@ turnoJogadorFim:
     addi sp, sp, 4
     ret
 
+###############################################################################################################
+
 # Função para calcular o valor da mão
 # a0 = endereço do array de cartas
 # a1 = número de cartas
 # Retorna o valor da mão em a0
-
-###############################################################################################################
 
 calcularMao:
     li t0, 0       # Contador
@@ -625,37 +625,30 @@ pescaCarta:
     ret
     
 exibePontuacaoFinal:
-    # Exibe "Pontuacao:\n"
     la a0, MSG_pontuacao
     li a7, 4
     ecall
 
-    # Exibe "   Dealer: "
     la a0, MSG_dealer
     li a7, 4
     ecall
 
-    # Exibe valor do dealer (s0)
     mv a0, s0
     li a7, 1
     ecall
 
-    # Exibe quebra de linha
     la a0, MSG_quebraLinha
     li a7, 4
     ecall
 
-    # Exibe "   Jogador: "
     la a0, MSG_jogador
     li a7, 4
     ecall
 
-    # Exibe valor do jogador (s1)
     mv a0, s1
     li a7, 1
     ecall
 
-    # Exibe quebra de linha
     la a0, MSG_quebraLinha
     li a7, 4
     ecall
@@ -665,7 +658,6 @@ exibePontuacaoFinal:
     bgt s1, s0, jogadorGanhouFinal
 
 empateFinal:
-    # Exibe quebra de linha
     la a0, MSG_quebraLinha
     li a7, 4
     ecall
@@ -676,7 +668,6 @@ empateFinal:
     ret 
 
 dealerGanhouFinal:
-    # Exibe quebra de linha
     la a0, MSG_quebraLinha
     li a7, 4
     ecall
@@ -687,7 +678,6 @@ dealerGanhouFinal:
     ret
 
 jogadorGanhouFinal:
-    # Exibe quebra de linha
     la a0, MSG_quebraLinha
     li a7, 4
     ecall
