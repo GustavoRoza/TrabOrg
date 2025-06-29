@@ -1,0 +1,10 @@
+roteiro para a apresentação:
+	
+	-> o que a gente não fez: 
+		precisamos de auxílio para salvar e verificar se as cartas ja foram sorteadas 		4 vezes, calculaMao, comparaMao
+
+	-> o que cada um fez: 
+		trabalhamos em conjunto, em momentos síncronos, através de chamadas e 			liveshare, iniciando no dia 27/05 e concluindo no dia 29/06.
+
+
+-> a gente se baseou no controle BreckJacquiLoop, para as repetidas rodadas do jogo, há um menu para o jogador selecionar se deseja jogar ou parar, assim que o jogador deseja jogar, separamos da seguinte forma para controle do fluxo de dados (obs: inicializamos a mao do jogador e do dealer com o .space, e o numeros de cartass de 1 a 13 com ..word, usamos pilha para armazenar esses valores manipula-los e realizar a contagem das cartas), Função para verificar se é necessário resetar o baralho ao ter menos de 12 cartas, função para comparar as cartar e comparar a mão para simular um jogo real e decidir quem ganhou a rodada, turno do dealer, pede mais carta até que tenha o valor inferior  17,  também criamos a função em que a segunda carta do dealer é oculta, criamos labels de resultado, labels de cálculo dos naipes, incrementa áses, pesca carta, que sorteia uma carta de 1 - 13. Fizemos usos de registradores, pilha, chamadas de funções, mv, jal, ret, j. Algumas funções são utilizadas de forma sequenciais e outras são chamadas com desvios condicionais e incondicionais.
